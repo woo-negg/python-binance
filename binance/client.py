@@ -222,6 +222,12 @@ class BaseClient:
         if self.testnet:
             url = self.FUTURES_TESTNET_URL
         return url + '/' + self.FUTURES_API_VERSION + '/' + path
+    
+    def _create_futures_api_uri2(self, path: str) -> str:
+        url = self.FUTURES_URL
+        if self.testnet:
+            url = self.FUTURES_TESTNET_URL
+        return url + '/' + self.FUTURES_API_VERSION2 + '/' + path
 
     def _create_futures_data_api_uri(self, path: str) -> str:
         url = self.FUTURES_DATA_URL
@@ -378,6 +384,11 @@ class Client(BaseClient):
 
     def _request_futures_api(self, method, path, signed=False, **kwargs) -> Dict:
         uri = self._create_futures_api_uri(path)
+
+        return self._request(method, uri, signed, True, **kwargs)
+
+    def _request_futures_api2(self, method, path, signed=False, **kwargs) -> Dict:
+        uri = self._create_futures_api_uri2(path)
 
         return self._request(method, uri, signed, True, **kwargs)
 
@@ -6276,7 +6287,7 @@ class Client(BaseClient):
         https://binance-docs.github.io/apidocs/futures/en/#future-account-balance-user_data
 
         """
-        return self._request_futures_api('get', 'balance', True, data=params)
+        return self._request_futures_api2('get', 'balance', True, data=params)
 
     def futures_account(self, **params):
         """Get current account information.
@@ -6284,7 +6295,7 @@ class Client(BaseClient):
         https://binance-docs.github.io/apidocs/futures/en/#account-information-user_data
 
         """
-        return self._request_futures_api('get', 'account', True, data=params)
+        return self._request_futures_api2('get', 'account', True, data=params)
 
     def futures_change_leverage(self, **params):
         """Change user's initial leverage of specific symbol market
@@ -6324,7 +6335,7 @@ class Client(BaseClient):
         https://binance-docs.github.io/apidocs/futures/en/#position-information-user_data
 
         """
-        return self._request_futures_api('get', 'positionRisk', True, data=params)
+        return self._request_futures_api2('get', 'positionRisk', True, data=params)
 
     def futures_account_trades(self, **params):
         """Get trades for the authenticated account and symbol.
@@ -7625,6 +7636,12 @@ class AsyncClient(BaseClient):
 
         return await self._request(method, uri, signed, True, **kwargs)
 
+    async def _request_futures_api2(self, method, path, signed=False, **kwargs) -> Dict:
+        uri = self._create_futures_api_uri2(path)
+
+        return await self._request(method, uri, signed, True, **kwargs)
+
+
     async def _request_futures_data_api(self, method, path, signed=False, **kwargs) -> Dict:
         uri = self._create_futures_data_api_uri(path)
 
@@ -8624,10 +8641,10 @@ class AsyncClient(BaseClient):
         return await self._request_futures_api('delete', 'batchOrders', True, data=params)
 
     async def futures_account_balance(self, **params):
-        return await self._request_futures_api('get', 'balance', True, data=params)
+        return await self._request_futures_api2('get', 'balance', True, data=params)
 
     async def futures_account(self, **params):
-        return await self._request_futures_api('get', 'account', True, data=params)
+        return await self._request_futures_api2('get', 'account', True, data=params)
 
     async def futures_change_leverage(self, **params):
         return await self._request_futures_api('post', 'leverage', True, data=params)
@@ -8642,7 +8659,7 @@ class AsyncClient(BaseClient):
         return await self._request_futures_api('get', 'positionMargin/history', True, data=params)
 
     async def futures_position_information(self, **params):
-        return await self._request_futures_api('get', 'positionRisk', True, data=params)
+        return await self._request_futures_api2('get', 'positionRisk', True, data=params)
 
     async def futures_account_trades(self, **params):
         return await self._request_futures_api('get', 'userTrades', True, data=params)
